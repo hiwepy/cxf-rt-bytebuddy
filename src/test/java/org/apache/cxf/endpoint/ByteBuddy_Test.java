@@ -6,6 +6,8 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.implementation.FieldAccessor;
 import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -40,5 +42,20 @@ public class ByteBuddy_Test {
 				assertThat((String) dynamicType.newInstance().apply("Byte Buddy"), is("Hello from Byte Buddy"));
 				
 	}
+	
+	/*@Test
+	public void test2() throws InstantiationException, IllegalAccessException {
+		MemoryDatabase loggingDatabase = new ByteBuddy()
+				  .subclass(MemoryDatabase.class)
+				  .method(named("load")).intercept(MethodDelegation.to(LoggerInterceptor.class))
+				  .make()
+				  .load(getClass().getClassLoader())
+				  .getLoaded()
+				  .newInstance();
+	}*/
+	
+
+
+	
 	
 }
