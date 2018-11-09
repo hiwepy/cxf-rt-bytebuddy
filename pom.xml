@@ -372,11 +372,11 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<byte-buddy.version>1.8.11</byte-buddy.version>
+		<byte-buddy.version>1.9.3</byte-buddy.version>
 		<commons-lang3.version>3.7</commons-lang3.version>
 		<commons-io.version>2.6</commons-io.version>
 		<commons-beanutils.version>1.9.3</commons-beanutils.version>
-		<cxf.version>3.2.4</cxf.version>
+		<cxf.version>3.2.7</cxf.version>
 		<java.version>1.8</java.version>
 		<junit.version>4.12</junit.version>
 		<slf4j.version>1.7.25</slf4j.version>
@@ -395,7 +395,6 @@
 		<maven-surefire-plugin.vertsion>2.21.0</maven-surefire-plugin.vertsion>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven-nexus-staging-plugin.version>1.6.8</maven-nexus-staging-plugin.version>
-		<metrics.version>3.2.2</metrics.version>
 	</properties>
 
 	<dependencyManagement>
