@@ -14,9 +14,8 @@ import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.AddressingFeature.Responses;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.Builder;
 import org.apache.cxf.endpoint.EndpointApi;
-import org.apache.cxf.endpoint.TimingInterceptor;
+import org.apache.cxf.endpoint.agent.TimingInterceptor;
 import org.apache.cxf.endpoint.annotation.WebBound;
 import org.apache.cxf.endpoint.jaxws.definition.SoapBound;
 import org.apache.cxf.endpoint.jaxws.definition.SoapMethod;
@@ -46,14 +45,14 @@ import net.bytebuddy.utility.RandomString;
  * @see https://www.jianshu.com/p/f55bfa7d472c
  * @see https://blog.csdn.net/qq_26761587/article/details/78798194
  */
-public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Object>> {
+public class EndpointApiBuilder<T extends EndpointApi> implements org.apache.commons.lang3.builder.Builder<Unloaded<T>> {
 
 	// 构建动态类
-	protected net.bytebuddy.dynamic.DynamicType.Builder<? extends Object> builder = null;
+	protected net.bytebuddy.dynamic.DynamicType.Builder<? extends EndpointApi> builder = null;
 	protected RandomString randomString = new RandomString(8);
-	protected static final String PREFIX = "org.apache.cxf.endpoint.";
+	protected static final String PREFIX = "org.apache.cxf.endpoint.jaxws.";
 
-	public EndpointApiCtClassBuilder() {
+	public EndpointApiBuilder() {
 
 		builder = new ByteBuddy().with(new NamingStrategy.AbstractBase() {
 			@Override
@@ -69,7 +68,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	 * @param prefix
 	 * @param randomName
 	 */
-	public EndpointApiCtClassBuilder(String prefix, boolean randomName) {
+	public EndpointApiBuilder(String prefix, boolean randomName) {
 
 		builder = new ByteBuddy().with(new NamingStrategy.AbstractBase() {
 			@Override
@@ -82,38 +81,33 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	}
 
 	/**
-	 * @param name
-	 *            The fully qualified name of the generated class in a binary
-	 *            format.
+	 * @param name The fully qualified name of the generated class in a binary format.
 	 */
-	public EndpointApiCtClassBuilder(String name) {
+	public EndpointApiBuilder(String name) {
 		builder = new ByteBuddy().subclass(EndpointApi.class).name(name);
 	}
 
 	/**
 	 * 自定义命名策略
-	 * 
-	 * @param namingStrategy
-	 *            ： The naming strategy to apply when creating a new auxiliary type.
+	 * @param namingStrategy ： The naming strategy to apply when creating a new auxiliary type.
 	 */
-	public EndpointApiCtClassBuilder(final NamingStrategy namingStrategy) {
+	public EndpointApiBuilder(final NamingStrategy namingStrategy) {
 		builder = new ByteBuddy().with(namingStrategy).subclass(EndpointApi.class);
 	}
 
 	/**
 	 * 添加 @WebService 注解
-	 * 
-	 * @param name：
-	 *            此属性的值包含XML Web Service的名称。在默认情况下，该值是实现XML Web
+	 * @param name： 此属性的值包含XML Web Service的名称。在默认情况下，该值是实现XML Web
 	 *            Service的类的名称，wsdl:portType 的名称。缺省值为 Java 类或接口的非限定名称。（字符串）
 	 * @param targetNamespace：指定你想要的名称空间，默认是使用接口实现类的包名的反缀（字符串）
 	 * @return
 	 */
-	public EndpointApiCtClassBuilder webService(final String name, final String targetNamespace) {
-		return this.webService(targetNamespace, targetNamespace, null, null, null, null);
+	public EndpointApiBuilder<T> webService(final String name, final String targetNamespace) {
+		this.webService(targetNamespace, targetNamespace, null, null, null, null);
+		return this;
 	}
 
-	public EndpointApiCtClassBuilder webService(final String name, final String targetNamespace, String serviceName) {
+	public EndpointApiBuilder webService(final String name, final String targetNamespace, String serviceName) {
 		return this.webService(targetNamespace, targetNamespace, serviceName, null, null, null);
 	}
 
@@ -134,7 +128,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	 *            服务接口全路径, 指定做SEI（Service EndPoint Interface）服务端点接口（字符串）
 	 * @return
 	 */
-	public EndpointApiCtClassBuilder webService(final String name, final String targetNamespace, String serviceName,
+	public EndpointApiBuilder<T> webService(final String name, final String targetNamespace, String serviceName,
 			String portName, String wsdlLocation, String endpointInterface) {
 
 		builder = JaxwsEndpointApiUtils.annotWebService(builder, name, targetNamespace, serviceName, portName,
@@ -147,7 +141,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	/**
 	 * 添加类注解 @WebService
 	 */
-	public EndpointApiCtClassBuilder webService(final SoapService service) {
+	public EndpointApiBuilder<T> webService(final SoapService service) {
 
 		return webService(service.getName(), service.getTargetNamespace(), service.getServiceName(),
 				service.getPortName(), service.getWsdlLocation(), service.getEndpointInterface());
@@ -167,7 +161,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	 *            ：Port name.
 	 * @return
 	 */
-	public EndpointApiCtClassBuilder webServiceProvider(final String wsdlLocation, final String serviceName,
+	public EndpointApiBuilder<T> webServiceProvider(final String wsdlLocation, final String serviceName,
 			final String targetNamespace, final String portName) {
 
 		builder = JaxwsEndpointApiUtils.annotWebServiceProvider(builder, wsdlLocation, serviceName, targetNamespace,
@@ -179,7 +173,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	/**
 	 * 添加类注解 @Addressing
 	 */
-	public EndpointApiCtClassBuilder addressing(final boolean enabled, final boolean required,
+	public EndpointApiBuilder<T> addressing(final boolean enabled, final boolean required,
 			final Responses responses) {
 
 		builder = JaxwsEndpointApiUtils.annotAddressing(builder, enabled, required, responses);
@@ -190,7 +184,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	/**
 	 * 添加类注解 @ServiceMode
 	 */
-	public EndpointApiCtClassBuilder serviceMode(final Service.Mode mode) {
+	public EndpointApiBuilder<T> serviceMode(final Service.Mode mode) {
 
 		builder = JaxwsEndpointApiUtils.annotServiceMode(builder, mode);
 
@@ -200,14 +194,14 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	/**
 	 * 通过给动态类增加 <code>@WebBound</code>注解实现，数据的绑定
 	 */
-	public EndpointApiCtClassBuilder bind(final String uid, final String json) {
+	public EndpointApiBuilder<T> bind(final String uid, final String json) {
 		return bind(new SoapBound(uid, json));
 	}
 
 	/**
 	 * 通过给动态类增加 <code>@WebBound</code>注解实现，数据的绑定
 	 */
-	public EndpointApiCtClassBuilder bind(final SoapBound bound) {
+	public EndpointApiBuilder<T> bind(final SoapBound bound) {
 
 		builder = builder.annotateType(new WebBound() {
 
@@ -231,7 +225,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 		return this;
 	}
 
-	public <T> EndpointApiCtClassBuilder newField(final Class<T> fieldClass, final String fieldName,
+	public <T> EndpointApiBuilder newField(final Class<T> fieldClass, final String fieldName,
 			final String fieldValue) {
 		builder = builder.defineField(fieldName, fieldClass, Modifier.PROTECTED).value(fieldValue);
 		return this;
@@ -249,7 +243,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	 *            ： 参数信息
 	 * @return
 	 */
-	public <T> EndpointApiCtClassBuilder newMethod(final Class<T> rtClass, final String methodName,
+	public <T> EndpointApiBuilder newMethod(final Class<T> rtClass, final String methodName,
 			SoapParam<?>... params) {
 		return this.newMethod(new SoapResult<T>(rtClass), new SoapMethod(methodName), null, params);
 	}
@@ -267,7 +261,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	 *            ： 参数信息
 	 * @return
 	 */
-	public <T> EndpointApiCtClassBuilder newMethod(final Class<T> rtClass, final String methodName,
+	public <T> EndpointApiBuilder newMethod(final Class<T> rtClass, final String methodName,
 			final SoapBound bound, SoapParam<?>... params) {
 		return this.newMethod(new SoapResult<T>(rtClass), new SoapMethod(methodName), bound, params);
 	}
@@ -286,7 +280,7 @@ public class EndpointApiCtClassBuilder implements Builder<Unloaded<? extends Obj
 	 *            ： 参数信息
 	 * @return
 	 */
-	public <T> EndpointApiCtClassBuilder newMethod(final SoapResult<T> result, final SoapMethod method,
+	public <T> EndpointApiBuilder newMethod(final SoapResult<T> result, final SoapMethod method,
 			final SoapBound bound, SoapParam<?>... params) {
 
 		Initial<? extends Object> initial = builder.defineMethod(method.getOperationName(), result.getRtClass());

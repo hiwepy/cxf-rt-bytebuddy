@@ -1,4 +1,4 @@
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
 public class GreetingInterceptor {
 	

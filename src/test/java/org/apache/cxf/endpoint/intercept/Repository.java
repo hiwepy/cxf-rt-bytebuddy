@@ -13,8 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
 public abstract class Repository<T> {
-    abstract T findOne(int id);
+    public abstract T findOne(int id);
 }

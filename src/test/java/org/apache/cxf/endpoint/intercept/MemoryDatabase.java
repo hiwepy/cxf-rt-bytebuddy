@@ -13,21 +13,15 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
+import java.util.Arrays;
 import java.util.List;
 
-import net.bytebuddy.implementation.bind.annotation.Super;
-
-class ChangingLoggerInterceptor {
+public class MemoryDatabase {
 	
-	public static List<String> log(String info, @Super MemoryDatabase zuper) {
-		System.out.println("Calling database");
-		try {
-			return zuper.load(info + " (logged access)");
-		} finally {
-			System.out.println("Returned from database");
-		}
+	public List<String> load(String info) {
+		return Arrays.asList(info + ": foo", info + ": bar");
 	}
 	
 }

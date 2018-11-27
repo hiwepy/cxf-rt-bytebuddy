@@ -12,19 +12,11 @@ import org.apache.cxf.endpoint.jaxrs.definition.RestMethod;
 import org.apache.cxf.endpoint.jaxrs.definition.RestParam;
 import org.apache.cxf.endpoint.utils.JaxrsEndpointApiUtils;
 
-import com.github.vindell.javassist.utils.ClassPoolFactory;
-import com.github.vindell.javassist.utils.JavassistUtils;
-
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.CtNewConstructor;
-import javassist.Modifier;
-import javassist.NotFoundException;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.NamingStrategy;
+import net.bytebuddy.description.type.TypeDescription;
+import net.bytebuddy.dynamic.DynamicType.Unloaded;
+import net.bytebuddy.utility.RandomString;
 
 /**
  * 
@@ -35,32 +27,54 @@ import javassist.bytecode.ConstPool;
  * <p>https://my.oschina.net/GameKing/blog/794580</p>
  * <p>http://wsmajunfeng.iteye.com/blog/1912983</p>
  */
-public class EndpointApiCtClassBuilder implements Builder<CtClass> {
-	
+public class EndpointApiBuilder<T extends EndpointApi> implements Builder<Unloaded<T>> {
+
 	// 构建动态类
-	protected ClassPool pool = null;
-	protected CtClass declaring  = null;
-	protected ClassFile ccFile = null;
-	//private Loader loader = new Loader(pool);
-	
-	public EndpointApiCtClassBuilder(final String classname) throws CannotCompileException, NotFoundException  {
-		this(ClassPoolFactory.getDefaultPool(), classname);
+	protected net.bytebuddy.dynamic.DynamicType.Builder<? extends EndpointApi> builder = null;
+	protected RandomString randomString = new RandomString(8);
+	protected static final String PREFIX = "org.apache.cxf.endpoint.jaxrs.";
+
+	public EndpointApiBuilder() {
+
+		builder = new ByteBuddy().with(new NamingStrategy.AbstractBase() {
+			@Override
+			protected String name(TypeDescription typeDescription) {
+				return PREFIX + typeDescription.getSimpleName() + "$" + randomString.nextString();
+			}
+
+		}).subclass(EndpointApi.class);
+
 	}
-	
-	public EndpointApiCtClassBuilder(final ClassPool pool, final String classname) throws CannotCompileException, NotFoundException {
-		
-		this.pool = pool;
-		this.declaring = JaxrsEndpointApiUtils.makeClass(pool, classname);
-		
-		/* 获得 JaxwsHandler 类作为动态类的父类 */
-		CtClass superclass = pool.get(EndpointApi.class.getName());
-		declaring.setSuperclass(superclass);
-		
-		// 默认添加无参构造器  
-		declaring.addConstructor(CtNewConstructor.defaultConstructor(declaring));
-		
-		this.ccFile = this.declaring.getClassFile();
-		
+
+	/**
+	 * @param prefix
+	 * @param randomName
+	 */
+	public EndpointApiBuilder(String prefix, boolean randomName) {
+
+		builder = new ByteBuddy().with(new NamingStrategy.AbstractBase() {
+			@Override
+			protected String name(TypeDescription typeDescription) {
+				return prefix + typeDescription.getSimpleName() + (randomName ? ("$" + randomString.nextString()) : "");
+			}
+
+		}).subclass(EndpointApi.class);
+
+	}
+
+	/**
+	 * @param name The fully qualified name of the generated class in a binary format.
+	 */
+	public EndpointApiBuilder(String name) {
+		builder = new ByteBuddy().subclass(EndpointApi.class).name(name);
+	}
+
+	/**
+	 * 自定义命名策略
+	 * @param namingStrategy ： The naming strategy to apply when creating a new auxiliary type.
+	 */
+	public EndpointApiBuilder(final NamingStrategy namingStrategy) {
+		builder = new ByteBuddy().with(namingStrategy).subclass(EndpointApi.class);
 	}
 	
 	/**
@@ -68,10 +82,10 @@ public class EndpointApiCtClassBuilder implements Builder<CtClass> {
 	 * @param path : Defines a URI template for the resource class or method, must not include matrix parameters.
 	 * @return
 	 */
-	public EndpointApiCtClassBuilder path(final String path) {
+	public EndpointApiBuilder<T> path(final String path) {
 
-		ConstPool constPool = this.ccFile.getConstPool();
-		JavassistUtils.addClassAnnotation(declaring, JaxrsEndpointApiUtils.annotPath(constPool, path));
+		builder.annotateType(JaxrsEndpointApiUtils.annotPath(constPool, path))
+		
 		
 		return this;
 	}

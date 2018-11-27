@@ -15,21 +15,20 @@
  */
 package org.apache.cxf.endpoint;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import javax.xml.ws.Action;
 
-import org.apache.cxf.endpoint.annotation.WebBound;
 import org.junit.Test;
 
 import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.method.MethodDescription;
-import net.bytebuddy.description.modifier.ModifierContributor;
 import net.bytebuddy.implementation.StubMethod;
 import net.bytebuddy.implementation.SuperMethodCall;
 import net.bytebuddy.implementation.attribute.MethodAttributeAppender;
+import net.bytebuddy.matcher.ElementMatchers;
 
 public class ByteBuddy_Annotation_Test {
 
@@ -53,26 +52,28 @@ public class ByteBuddy_Annotation_Test {
 	@Test
 	public void test1() throws InstantiationException, IllegalAccessException {
 
- 
-		
-		/*new ByteBuddy().subclass(Object.class).annotateType(new RuntimeDefinitionImpl()).make();
+		new ByteBuddy().subclass(Object.class).annotateType(new RuntimeDefinitionImpl()).make();
 
-		new ByteBuddy().subclass(Object.class).annotateType(new RuntimeDefinitionImpl()).method(named("toString"))
-				.intercept(SuperMethodCall.INSTANCE).annotateMethod(new RuntimeDefinitionImpl())
-				.defineField("foo", Object.class).annotateField(new RuntimeDefinitionImpl());*/
+	}
+	
+	@Test
+	public void test2() throws InstantiationException, IllegalAccessException {
+
+		new ByteBuddy().subclass(Object.class).annotateType(new RuntimeDefinitionImpl())
+				.method(ElementMatchers.named("toString")).intercept(SuperMethodCall.INSTANCE)
+				.annotateMethod(new RuntimeDefinitionImpl()).defineField("foo", Object.class)
+				.annotateField(new RuntimeDefinitionImpl());
 
 	}
 
-/*	@Test
+	@Test
 	public void test3() throws InstantiationException, IllegalAccessException {
-		
-		new ByteBuddy()
-		  .subclass(AnnotatedMethod.class)
-		  .method(MethodDescription.CONSTRUCTOR_INTERNAL_NAME.named("bar"))
-		  .intercept(StubMethod.INSTANCE)
-		  .attribute(MethodAttributeAppender.ForInstrumentedMethod.INSTANCE)
 
+		new ByteBuddy().subclass(AnnotatedMethod.class).method(ElementMatchers.named("bar"))
+				.intercept(StubMethod.INSTANCE)
+				.attribute(MethodAttributeAppender.ForInstrumentedMethod.EXCLUDING_RECEIVER);
 
-	}*/
+	}
 
 }
+

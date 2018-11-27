@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2018, vindell (https://github.com/vindell).
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -13,13 +13,19 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
+import java.lang.reflect.Method;
 
-import java.lang.annotation.Retention;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
 
-@Retention(RUNTIME)
-public @interface Scope {
-   String value();
+public class FindOneInterceptor {
+
+	// 通过 method 和 arguments 可获得原方法引用与实际传入参数
+	// 如果不关心它们或其中某个，可在声明 intercept() 方法时省略。也能加更多参数，如 @SuperCall Callable<?> call
+	static String intercept(@Origin Method method, @AllArguments Object[] arguments) {
+		return "http://unmi.cc/?p=" + arguments[0];
+	}
+			
 }

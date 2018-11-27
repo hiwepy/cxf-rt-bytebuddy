@@ -38,7 +38,6 @@ public class JaxwsEndpointApiUtils {
 
 	/**
 	 * 构造 @WebServiceProvider 注解
-	 * @param constPool	
 	 * @param wsdlLocation		：Location of the WSDL description for the service.
 	 * @param serviceName		：Service name.
 	 * @param targetNamespace	：Target namespace for the service

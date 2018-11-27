@@ -13,28 +13,26 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public class LoggingMemoryDatabase extends MemoryDatabase {
+import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
-	  private class LoadMethodSuperCall implements Callable {
-
-	    private final String info;
-	    private LoadMethodSuperCall(String info) {
-	      this.info = info;
-	    }
-
-	    @Override
-	    public Object call() throws Exception {
-	      return LoggingMemoryDatabase.super.load(info);
-	    }
-	  }
-
-	  @Override
-	  public List<String> load(String info) {
-	    return LoggerInterceptor.log(new LoadMethodSuperCall(info));
-	  }
+public class LoggerInterceptor {
+	
+	public static List<String> log(@SuperCall Callable<List<String>> zuper)  {
+		System.out.println("Calling database");
+		try {
+			return zuper.call();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} finally {
+			System.out.println("Returned from database");
+		}
 	}
+	
+}

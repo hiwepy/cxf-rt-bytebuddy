@@ -13,9 +13,23 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
-class Loop {
-  public String loop(String value) { return value; }
-  public int loop(int value) { return value; }
+import java.util.List;
+
+import org.apache.cxf.endpoint.MemoryDatabase;
+
+import net.bytebuddy.implementation.bind.annotation.Super;
+
+class ChangingLoggerInterceptor {
+	
+	public static List<String> log(String info, @Super MemoryDatabase zuper) {
+		System.out.println("Calling database");
+		try {
+			return zuper.load(info + " (logged access)");
+		} finally {
+			System.out.println("Returned from database");
+		}
+	}
+	
 }

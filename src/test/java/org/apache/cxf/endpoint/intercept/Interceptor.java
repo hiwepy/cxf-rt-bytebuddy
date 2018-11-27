@@ -13,15 +13,16 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
-import java.util.Arrays;
-import java.util.List;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
-class MemoryDatabase {
-	
-	public List<String> load(String info) {
-		return Arrays.asList(info + ": foo", info + ": bar");
+class Interceptor {
+  
+	@RuntimeType
+ 	public static Object intercept(@RuntimeType Object value) {
+		System.out.println("Invoked method with: " + value);
+		return value;
 	}
-	
+  
 }

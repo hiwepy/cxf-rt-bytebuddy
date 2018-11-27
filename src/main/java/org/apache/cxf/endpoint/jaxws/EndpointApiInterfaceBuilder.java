@@ -35,7 +35,7 @@ import javassist.bytecode.annotation.Annotation;
  * <p>https://my.oschina.net/GameKing/blog/794580</p>
  * <p>http://wsmajunfeng.iteye.com/blog/1912983</p>
  */
-public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
+public class EndpointApiInterfaceBuilder implements Builder<CtClass> {
 	
 	// 构建动态类
 	private ClassPool pool = null;
@@ -44,11 +44,11 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	
 	//private Loader loader = new Loader(pool);
 	
-	public EndpointApiInterfaceCtClassBuilder(final String classname) throws CannotCompileException, NotFoundException  {
+	public EndpointApiInterfaceBuilder(final String classname) throws CannotCompileException, NotFoundException  {
 		this(ClassPoolFactory.getDefaultPool(), classname);
 	}
 	
-	public EndpointApiInterfaceCtClassBuilder(final ClassPool pool, final String classname) throws CannotCompileException, NotFoundException {
+	public EndpointApiInterfaceBuilder(final ClassPool pool, final String classname) throws CannotCompileException, NotFoundException {
 		
 		this.pool = pool;
 		this.declaring = JaxwsEndpointApiUtils.makeInterface(pool, classname);
@@ -66,11 +66,11 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	 * @param targetNamespace：指定你想要的名称空间，默认是使用接口实现类的包名的反缀（字符串）
 	 * @return
 	 */
-	public EndpointApiInterfaceCtClassBuilder webService(final String name, final String targetNamespace) {
+	public EndpointApiInterfaceBuilder webService(final String name, final String targetNamespace) {
 		return this.webService(targetNamespace, targetNamespace, null, null, null, null);
 	}
 	
-	public EndpointApiInterfaceCtClassBuilder webService(final String name, final String targetNamespace, String serviceName) {
+	public EndpointApiInterfaceBuilder webService(final String name, final String targetNamespace, String serviceName) {
 		return this.webService(targetNamespace, targetNamespace, serviceName, null, null, null);
 	}
 	
@@ -84,7 +84,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	 * @param endpointInterface： 服务接口全路径, 指定做SEI（Service EndPoint Interface）服务端点接口（字符串）
 	 * @return
 	 */
-	public EndpointApiInterfaceCtClassBuilder webService(final String name, final String targetNamespace, String serviceName,
+	public EndpointApiInterfaceBuilder webService(final String name, final String targetNamespace, String serviceName,
 			String portName, String wsdlLocation, String endpointInterface) {
 
 		return webService(new SoapService(name, targetNamespace, serviceName, portName, wsdlLocation, endpointInterface));
@@ -93,7 +93,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	/**
 	 * 添加类注解 @WebService
 	 */
-	public EndpointApiInterfaceCtClassBuilder webService(final SoapService service) {
+	public EndpointApiInterfaceBuilder webService(final SoapService service) {
 
 		ConstPool constPool = this.classFile.getConstPool();
 		Annotation annot = JaxwsEndpointApiUtils.annotWebService(constPool, service);
@@ -105,7 +105,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	/**
 	 * 添加类注解 @ServiceMode
 	 */
-	public EndpointApiInterfaceCtClassBuilder serviceMode(final Service.Mode mode) {
+	public EndpointApiInterfaceBuilder serviceMode(final Service.Mode mode) {
 		
 		ConstPool constPool = this.classFile.getConstPool();
 		Annotation annot = JaxwsEndpointApiUtils.annotServiceMode(constPool, mode);
@@ -117,7 +117,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	/**
 	 * 添加类注解 @WebServiceProvider
 	 */
-	public EndpointApiInterfaceCtClassBuilder webServiceProvider(String wsdlLocation, String serviceName,
+	public EndpointApiInterfaceBuilder webServiceProvider(String wsdlLocation, String serviceName,
 			String targetNamespace, String portName) {
 
 		ConstPool constPool = this.classFile.getConstPool();
@@ -131,7 +131,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	/**
 	 * 添加类注解 @Addressing
 	 */
-	public EndpointApiInterfaceCtClassBuilder addressing(final boolean enabled, final boolean required,
+	public EndpointApiInterfaceBuilder addressing(final boolean enabled, final boolean required,
 			final Responses responses) {
 		
 		ConstPool constPool = this.classFile.getConstPool();
@@ -144,14 +144,14 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	/**
 	 * 通过给动态类增加 <code>@WebBound</code>注解实现，数据的绑定
 	 */
-	public EndpointApiInterfaceCtClassBuilder bind(final String uid, final String json) {
+	public EndpointApiInterfaceBuilder bind(final String uid, final String json) {
 		return bind(new SoapBound(uid, json));
 	}
 	
 	/**
 	 * 通过给动态类增加 <code>@WebBound</code>注解实现，数据的绑定
 	 */
-	public EndpointApiInterfaceCtClassBuilder bind(final SoapBound bound) {
+	public EndpointApiInterfaceBuilder bind(final SoapBound bound) {
 
 		ConstPool constPool = this.classFile.getConstPool();
 		Annotation annot = JaxwsEndpointApiUtils.annotWebBound(constPool, bound);
@@ -173,13 +173,13 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
      *
      * @param src               the source text.
      */
-	public <T> EndpointApiInterfaceCtClassBuilder makeField(final String src) throws CannotCompileException {
+	public <T> EndpointApiInterfaceBuilder makeField(final String src) throws CannotCompileException {
 		//创建属性
         declaring.addField(CtField.make(src, declaring));
 		return this;
 	}
 	
-	public <T> EndpointApiInterfaceCtClassBuilder newField(final Class<T> fieldClass, final String fieldName, final String fieldValue) throws CannotCompileException, NotFoundException {
+	public <T> EndpointApiInterfaceBuilder newField(final Class<T> fieldClass, final String fieldName, final String fieldValue) throws CannotCompileException, NotFoundException {
 		
 		// 检查字段是否已经定义
 		if(JavassistUtils.hasField(declaring, fieldName)) {
@@ -196,7 +196,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 		return this;
 	}
 	
-	public <T> EndpointApiInterfaceCtClassBuilder removeField(final String fieldName) throws NotFoundException {
+	public <T> EndpointApiInterfaceBuilder removeField(final String fieldName) throws NotFoundException {
 		
 		// 检查字段是否已经定义
 		if(!JavassistUtils.hasField(declaring, fieldName)) {
@@ -218,7 +218,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	 * @throws CannotCompileException
 	 * @throws NotFoundException 
 	 */
-	public <T> EndpointApiInterfaceCtClassBuilder abstractMethod(final Class<T> rtClass, final String methodName, SoapParam<?>... params) throws CannotCompileException, NotFoundException {
+	public <T> EndpointApiInterfaceBuilder abstractMethod(final Class<T> rtClass, final String methodName, SoapParam<?>... params) throws CannotCompileException, NotFoundException {
 		return this.abstractMethod(new SoapResult<T>(rtClass), new SoapMethod(methodName), null, params);
 	}
 	
@@ -233,7 +233,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	 * @throws CannotCompileException
 	 * @throws NotFoundException
 	 */
-	public <T> EndpointApiInterfaceCtClassBuilder abstractMethod(final Class<T> rtClass, final String methodName, final SoapBound bound, SoapParam<?>... params) throws CannotCompileException, NotFoundException {
+	public <T> EndpointApiInterfaceBuilder abstractMethod(final Class<T> rtClass, final String methodName, final SoapBound bound, SoapParam<?>... params) throws CannotCompileException, NotFoundException {
 		return this.abstractMethod(new SoapResult<T>(rtClass), new SoapMethod(methodName), bound, params);
 	}
 	
@@ -248,7 +248,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
 	 * @throws CannotCompileException
 	 * @throws NotFoundException 
 	 */ 
-	public <T> EndpointApiInterfaceCtClassBuilder abstractMethod(final SoapResult<T> result, final SoapMethod method, final SoapBound bound, SoapParam<?>... params) throws CannotCompileException, NotFoundException {
+	public <T> EndpointApiInterfaceBuilder abstractMethod(final SoapResult<T> result, final SoapMethod method, final SoapBound bound, SoapParam<?>... params) throws CannotCompileException, NotFoundException {
 	       
 		ConstPool constPool = this.classFile.getConstPool();
 		
@@ -276,7 +276,7 @@ public class EndpointApiInterfaceCtClassBuilder implements Builder<CtClass> {
         return this;
 	}
 	
-	public <T> EndpointApiInterfaceCtClassBuilder removeMethod(final String methodName, SoapParam<?>... params) throws NotFoundException {
+	public <T> EndpointApiInterfaceBuilder removeMethod(final String methodName, SoapParam<?>... params) throws NotFoundException {
 		
 		// 有参方法
 		if(params != null && params.length > 0) {

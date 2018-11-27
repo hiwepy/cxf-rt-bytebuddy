@@ -15,22 +15,26 @@
  */
 package org.apache.cxf.endpoint;
 
+import java.io.File;
+
+import org.apache.cxf.endpoint.intercept.FindOneInterceptor;
+import org.apache.cxf.endpoint.intercept.LoggerInterceptor;
+import org.apache.cxf.endpoint.intercept.MemoryDatabase;
+import org.apache.cxf.endpoint.intercept.Repository;
+import org.apache.cxf.endpoint.intercept.Scope;
+import org.junit.Test;
+
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.annotation.AnnotationDescription;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.MethodDelegation;
-import net.bytebuddy.implementation.bind.annotation.AllArguments;
-import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.io.File;
-import java.lang.reflect.Method;
 
 /**
  * https://unmi.cc/leverage-bytebuddy-generate-generic-subclass/#more-7792
  */
-public class Main {
+public class ByteBuddy_GenericSubclass_Test {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
@@ -61,12 +65,17 @@ public class Main {
 		Repository<String> repository = repositoryClass.newInstance();
 		System.out.println(repository.findOne(7792)); // 输出 http://unmi.cc/?p=7792
 	}
+	
 
-	private static class FindOneInterceptor {
-		// 通过 method 和 arguments 可获得原方法引用与实际传入参数
-		// 如果不关心它们或其中某个，可在声明 intercept() 方法时省略。也能加更多参数，如 @SuperCall Callable<?> call
-		static String intercept(@Origin Method method, @AllArguments Object[] arguments) {
-			return "http://unmi.cc/?p=" + arguments[0];
-		}
+	@Test
+	public void test3() throws InstantiationException, IllegalAccessException {
+		MemoryDatabase loggingDatabase = new ByteBuddy()
+				.subclass(MemoryDatabase.class)
+				.method(ElementMatchers.named("load"))
+				.intercept(MethodDelegation.to(LoggerInterceptor.class)).make()
+				.load(getClass().getClassLoader())
+				.getLoaded()
+				.newInstance();
 	}
+ 
 }

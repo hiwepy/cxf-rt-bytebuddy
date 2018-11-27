@@ -33,7 +33,7 @@ public class ByteBuddy_JaxwsApi_Test {
 				.make();
 		 
 		
-		Object ctObject = new EndpointApiCtClassBuilder("org.apache.cxf.spring.boot.FirstCaseV2")
+		Object ctObject = new EndpointApiBuilder("org.apache.cxf.spring.boot.FirstCaseV2")
 				.webService("get", "http://ws.cxf.com", "getxx")
 				.newField(String.class, "uid", UUID.randomUUID().toString())
 				.newMethod(String.class, "sayHello", new SoapParam(String.class, "text"))

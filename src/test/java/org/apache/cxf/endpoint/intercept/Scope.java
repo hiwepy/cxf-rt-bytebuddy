@@ -13,16 +13,12 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.apache.cxf.endpoint;
+package org.apache.cxf.endpoint.intercept;
 
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import java.lang.annotation.Retention;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-class Interceptor {
-  
-	@RuntimeType
- 	public static Object intercept(@RuntimeType Object value) {
-		System.out.println("Invoked method with: " + value);
-		return value;
-	}
-  
+@Retention(RUNTIME)
+public @interface Scope {
+   String value();
 }
