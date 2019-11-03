@@ -16,23 +16,21 @@ import org.apache.cxf.endpoint.jaxrs.definition.RestBound;
 import org.apache.cxf.endpoint.jaxrs.definition.RestParam;
 import org.junit.Test;
 
-import javassist.CtClass;
-
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class JaxrsApiCtClassBuilder_Test {
 
 	//@Test
 	public void testClass() throws Exception {
-		
+		/*
 		CtClass ctClass = new EndpointApiCtClassBuilder("org.apache.cxf.spring.boot.FirstCase1")
 				.path("getxx")
 				.makeField("public int k = 3;")
 				.newField(String.class, "uid", UUID.randomUUID().toString())
 				.newMethod(String.class, HttpMethodEnum.GET, "sayHello", "{id}/info" ,new RestParam(String.class, "id", HttpParamEnum.PATH))
 				.newMethod(HttpMethodEnum.GET, "sayHello2", "{id}/info", new RestParam(String.class, "text"))
-				.build();
+				.build();*/
 		
-		Class clazz = ctClass.toClass();
+		Class clazz = null;//ctClass.toClass();
 		
 		System.err.println("=========Type Annotations======================");
 		for (Annotation element : clazz.getAnnotations()) {

@@ -17,8 +17,6 @@ package org.apache.cxf.endpoint.intercept;
 
 import java.util.List;
 
-import org.apache.cxf.endpoint.MemoryDatabase;
-
 import net.bytebuddy.implementation.bind.annotation.Super;
 
 class ChangingLoggerInterceptor {
