@@ -15,15 +15,14 @@
  */
 package org.apache.cxf.endpoint.utils;
 
-import javax.jws.HandlerChain;
-import javax.jws.WebService;
-import javax.xml.ws.Service;
-import javax.xml.ws.Service.Mode;
-import javax.xml.ws.ServiceMode;
-import javax.xml.ws.WebServiceProvider;
-import javax.xml.ws.soap.Addressing;
-import javax.xml.ws.soap.AddressingFeature.Responses;
 
+import jakarta.jws.HandlerChain;
+import jakarta.jws.WebService;
+import jakarta.xml.ws.Service;
+import jakarta.xml.ws.ServiceMode;
+import jakarta.xml.ws.WebServiceProvider;
+import jakarta.xml.ws.soap.Addressing;
+import jakarta.xml.ws.soap.AddressingFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.endpoint.annotation.WebBound;
 import org.apache.cxf.endpoint.jaxws.definition.SoapBound;
@@ -129,7 +128,7 @@ public class JaxwsEndpointApiUtils {
 	 * 构造 @Addressing 注解
 	 */
 	public static Builder<? extends Object> annotAddressing(final Builder<? extends Object> builder, final boolean enabled, final boolean required,
-			final Responses responses) {
+			final AddressingFeature.Responses responses) {
 		
 		return builder.annotateType(new Addressing() {
 
@@ -149,7 +148,7 @@ public class JaxwsEndpointApiUtils {
 			}
 
 			@Override
-			public Responses responses() {
+			public AddressingFeature.Responses responses() {
 				return responses;
 			}
 			
@@ -166,7 +165,7 @@ public class JaxwsEndpointApiUtils {
 		return builder.annotateType(new ServiceMode() {
 
 			@Override
-			public Mode value() {
+			public Service.Mode value() {
 				return mode;
 			}
 
